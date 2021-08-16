@@ -1,8 +1,8 @@
-# Project 1: ELK Stack - Cloud-based SIEM
+# Project 1: ELK Stack - Automated Deployment
+
+This is a write-up for the USYD Cybersecurity Project 1. This Project was built to demonstrate a cloud-based solution utilizing the ELK stack to monitor two vulnerable web applications. 
 
 ## Overview
-This is a write-up for the Cybersecurity USYD Project 1. This Project was built to demonstrate a cloud-based solution utilizing the ELK stack to monitor two vulnerable web applications. 
-
 The files in this repository were used to configure the network depicted below.
 
 ![Images/diagram_elk.png](Images/diagram_elk.png)
@@ -138,11 +138,11 @@ These files have been tested and used to generate a live ELK deployment on Azure
 
 ## Background
 This document contains the following details:
-- Description of the Topologu
+- Description of the Topology
 - Access Policies
 - ELK Configuration
-..* Beats in Use
-..* Machines Being Monitored
+- Beats in Use
+- Machines Being Monitored
 - How to Use the Ansible Build
 
 
@@ -154,7 +154,7 @@ Load balancing ensures that the application will be highly available, in additio
 > The aspect of security that load balancers are directed at is **redundancy**. In particular, protecting against DDoS attacks by shifting attack traffic.
 
 What is the advantage of using a Jumpbox?
-> there are a myriad of advantages of utilising a 'jumpbox'. Importantly, it helps create a security zone which can be used to configure multiple devices from one 'control' system. 
+> There are a myriad of advantages of utilising a 'jumpbox'. Importantly, it helps create a security zone which can be used to configure multiple devices from one 'control' system. 
 
 Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the configuration and system files.
 
@@ -178,26 +178,28 @@ The machines on the internal network are not exposed to the public Internet.
 
 Only the Jumpbox machine (Jump-Box) can accept connections (SSH) from the Internet. Access to this machine is only allowed from the On-Premise/Local Machine IP which was configured in the Network Security Group (Red-SG). 
 
-Machines within the network can only be accessed by the Jump-Box Container.
-> Additionally, the Jumpbox Container (10.0.0.4) can access the ELK VM using SSH. *Important to note - one must be attached to the Jump-Box docker container before attempting to access the ELK VM*  
+Machines within the network can only be accessed by the Jump-Box Container. Additionally, the Jumpbox Container (10.0.0.4) can access the ELK VM using SSH.
+> *Important to note - you need to be attached to the Jump-Box Docker Container before attempting to access the ELK VM*  
 
 A summary of the access policies in place can be found in the table below.
 
 | Name     | Publicly Accessible | Allowed IP Addresses        |
 |----------|---------------------|-----------------------------|
-| Jump Box | Yes (SSH)           | On-Premise/Local Machine IP |
+| Jump-Box | Yes (SSH)           | On-Premise/Local Machine IP |
 | Web-1    | No                  | 10.0.0.4 (Jump-Box)         |
 | Web-2    | No                  | 10.0.0.4 (Jump-Box)         |
 | ELK-VM   | No                  | 10.0.0.4 (Jump-Box)         |
 | DVWA-LB  | No                  | On-Premise/Local Machine IP |
+
+> **Note** While Jump-box/Elk-VM/DVWA-LB are not explicitly 'publicly accessible', this was set under the Network Security Group Rules (Red-SG, ELK-SG) to only allow certain traffic (From Jump-box/Local Machine IP). These could easily be put public. 
 
 
 ## Elk Configuration
 
 Ansible was used to automate configuration of the ELK machine. No configuration was performed manually, which is advantageous because:
 1. **Automation** - build/deploy quickly and efficiently. 
-2. **Consistency** - allows for consistent system configurations/security measures ranging from small to large scale operations.
-3. **Simple** - simplified processes allows for a range of individuals to implement/upgrade/understand the process and roling out of ELK monitoring solutions.
+2. **Consistency/Scalability** - allows for consistent system configurations/security measures ranging from small to large scale operations.
+3. **Simple** - the simplified processes allow for a range of individuals to implement/upgrade/understand the rolling out of ELK monitoring solutions.
 
 The [install-elk.yml](Resources/install-elk.yml) implements the following tasks:
 1. Installs Docker
@@ -238,6 +240,17 @@ SSH into the control node and follow the steps below:
 [elk]
 10.1.0.4 ansible_python_interpreter=/usr/bin/python3
 ```
-- Run the playbook, and navigate to `http:/<ELK-VM-ip>:5601/app/kibana` to check that the installation worked as expected.
+- Run the playbook(s), and navigate to `http:/<ELK-VM-ip>:5601/app/kibana` to check that the installation worked as expected.
 
 *VM IPs may differ*
+
+### Running Playbook Commands
+After inputing the necessary playbooks into the `/etc/ansible/*` folder. There is a specific process to run them.
+1. Firstly, ssh into the jump-box using `ssh azadmin@<jump-box-ip>`
+2. Start the Docker Container with `sudo docker start <container name>`
+3. Attach to the Docker Container with `sudo docker attach <container name>`
+4. Run the necessary playbook with `ansible-playbook /etc/ansible/<playbook-name.yml>`
+5. If the playbooks have been configured correctly, ELK-VM/Web-1/Web-2 should be set up.
+> Navigate to `http:/<ELK-VM-ip>:5601/app/kibana` to check that the installation worked as expected. Furthermore, you can check `filebeat` dashboard and see events from the Web VMs are being tracked.
+
+![Images/filebeat_success.png](Images/filebeat_success.png)
