@@ -1,6 +1,6 @@
 # Project 1: ELK Stack - Automated Deployment
 
-This is a write-up for the USYD Cybersecurity Project 1. This Project was built to demonstrate a cloud-based solution utilizing the ELK stack to monitor two vulnerable web applications. 
+This is a write-up for the Cybersecurity Project 1. This Project was built to demonstrate a cloud-based solution utilizing the ELK stack to monitor two vulnerable web applications. 
 
 ## Overview
 The files in this repository were used to configure the network depicted below.
